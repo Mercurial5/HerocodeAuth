@@ -4,14 +4,17 @@ from flask_migrate import Migrate
 from config import PostgreSQLConfig
 
 
-app = Flask(__name__)
-app.config.from_object(PostgreSQLConfig)
-
 db = SQLAlchemy()
-migrate = Migrate(app, db)
+migrate = Migrate()
 
 
 def create_app() -> Flask:
-    db.init_app(app)
+    app = Flask(__name__)
+
+    app.config.from_object(PostgreSQLConfig)
     
+    db.init_app(app)
+    migrate.init_app(app, db)
+
+
     return app

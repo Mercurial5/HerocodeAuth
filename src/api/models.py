@@ -17,12 +17,11 @@ class User(db.Model):
 
 
     def hash_password(self, plain_text_password):
-        password_bytes = plain_text_password.encode('utf-8')
-        self.password = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
+        self.password = bcrypt.hashpw(plain_text_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
     def verify_password(self, plain_text_password):
-        return bcrypt.checkpw(plain_text_password, self.password)
-
+        return bcrypt.checkpw(plain_text_password.encode('utf-8'), self.password.encode('utf-8'))
+    
     def __repr__(self):
         return f'<User {self.username}>'
     

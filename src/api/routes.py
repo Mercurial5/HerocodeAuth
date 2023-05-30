@@ -47,7 +47,7 @@ def register():
     redis_conn.hmset(redis_key, redis_data)
     redis_conn.expire(redis_key, current_app.config['REDIS_EXPIRATION'])
 
-    send_email(current_app, token, email, subject)
+    send_email(current_app, token, email, subject, 'register_verify')
 
     return jsonify({'message': 'Registration successful'}), 200
 
@@ -101,7 +101,7 @@ def login():
     password = data['password']
 
     user = authenticate(email, password)
-    print(session)
+    
     if 'username' in session:
         return jsonify({'message': 'You are already logged in'})
     
@@ -110,7 +110,6 @@ def login():
         db.session.commit()
 
         session['username'] = user.username
-        print(session)
         expires = timedelta(days=1)
         access_token = create_access_token(identity=str(user.id), expires_delta=expires)
         return jsonify({'access_token': access_token}), 200
@@ -123,3 +122,66 @@ def logout():
     if 'username' in session:
         session.pop('username', None)
     return jsonify({'message': 'Successfuly logged out!'})
+
+
+@auth_bp.route('/reset-password', methods=['POST'])
+def reset_password():
+    data = request.get_json()
+
+    if 'email' not in data:
+        return jsonify({'message': 'Please provide Email'}), 401
+    
+    email = data['email']
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        return jsonify({'message': 'User not registered, please sign up first'}), 404
+    
+    token = generate_confirmation_token(email)
+
+    redis_conn = get_redis_connection()
+    redis_key = f'{token}'
+    redis_data = {
+        'email': email,
+        'reset_token': token
+    }
+    redis_conn.hmset(redis_key, redis_data)
+    redis_conn.expire(redis_key, current_app.config['REDIS_EXPIRATION'])
+
+    subject = "Please click here to reset password"
+
+    send_email(current_app, token, email, subject, 'change_password')
+
+    return jsonify({'message': 'Password changed successfully'})
+
+
+@auth_bp.route('/change-password', methods=['POST'])
+def change_password():
+    data = request.get_json()
+    token = request.args.get('token')
+
+    if not token:
+        return jsonify({'message': 'Please check your email'}), 400
+    if 'new_password' not in data:
+        return jsonify({'message': 'Please provide new password'}), 400
+    
+    new_password = data['new_password']
+    
+    redis_conn = get_redis_connection()
+    redis_key = f'{token}'
+    redis_data_in_bytes = redis_conn.hgetall(redis_key)
+    redis_data = {key.decode(): value.decode() for key, value in redis_data_in_bytes.items()}
+
+    if not redis_data:
+        return jsonify({'message': 'User data not found'}), 404
+    
+    if not redis_data.get('reset_token'):
+        return jsonify({'message': 'Reset password to change'})
+   
+    user = User.query.filter_by(email=redis_data.get('email')).first()
+    if user.verify_password(new_password):
+        return jsonify({'message': 'New password cannot be the same as the old password'}), 400
+    user.hash_password(new_password)
+    db.session.commit()
+    
+    return jsonify({'message': 'Password changed successfully'}), 200

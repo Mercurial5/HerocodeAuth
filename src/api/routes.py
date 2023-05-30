@@ -8,7 +8,7 @@ from api.redis_db import get_redis_connection
 from api.models import User
 from api.email import send_email
 from api import db
-from api.is_valid_password import is_valid_password
+from api.is_valid import is_valid_password, is_valid_email
 
 
 auth_bp = Blueprint("auth_bp", __name__, url_prefix='/api/v1')
@@ -34,10 +34,12 @@ def register():
     if User.query.filter_by(email=email).first():
         return {'message': 'Email already taken'}, 409
 
+    if not is_valid_email(email):
+        return jsonify({'message': 'Invalid email address'}), 400
+
     isvalid = is_valid_password(password)
     if isvalid != True:
         return {'message': f'{isvalid}'}, 400
-
 
     subject = "Please confirm your email"
     token = generate_confirmation_token(email)

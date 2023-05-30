@@ -1,5 +1,6 @@
 import re
 
+
 def is_valid_password(password):
     MIN_LENGTH = 8
     MAX_LENGTH = 64
@@ -20,3 +21,13 @@ def is_valid_password(password):
         return "Password must contain at least one special character."
 
     return True
+
+
+def is_valid_email(email):
+    # Regular expression pattern for validating email addresses
+    pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+
+    if re.match(pattern, email):
+        return True
+    else:
+        return False

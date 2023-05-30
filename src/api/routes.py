@@ -1,7 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import Blueprint
 from flask import request, jsonify
-from flask import current_app
+from flask import current_app, session
+from flask_jwt_extended import create_access_token
 from api.token import generate_confirmation_token
 from api.redis_db import get_redis_connection
 from api.models import User
@@ -80,3 +81,45 @@ def register_verify():
     redis_conn.hset(redis_key, 'verified', 'True')
 
     return jsonify({'message': 'User verified!!!'}), 200
+
+
+def authenticate(email, password):
+    user = User.query.filter_by(email=email).first()
+    if user and user.verify_password(password):
+        return user
+    return False
+
+
+@auth_bp.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+
+    if 'email' not in data or "password" not in data:
+        return jsonify({'message': 'Please provide credentials'}), 401
+    
+    email = data['email']
+    password = data['password']
+
+    user = authenticate(email, password)
+    print(session)
+    if 'username' in session:
+        return jsonify({'message': 'You are already logged in'})
+    
+    if user:
+        user.last_login=datetime.now()
+        db.session.commit()
+
+        session['username'] = user.username
+        print(session)
+        expires = timedelta(days=1)
+        access_token = create_access_token(identity=str(user.id), expires_delta=expires)
+        return jsonify({'access_token': access_token}), 200
+    
+    return jsonify({'message': 'Invalid credentials'}), 401
+    
+
+@auth_bp.route('/logout')
+def logout():
+    if 'username' in session:
+        session.pop('username', None)
+    return jsonify({'message': 'Successfuly logged out!'})

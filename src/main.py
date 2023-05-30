@@ -1,5 +1,4 @@
 from api import create_app
-from api import db
 from flask_jwt_extended import JWTManager
 
 app = create_app()

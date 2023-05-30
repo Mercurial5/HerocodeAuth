@@ -8,6 +8,7 @@ from api.redis_db import get_redis_connection
 from api.models import User
 from api.email import send_email
 from api import db
+from api.is_valid_password import is_valid_password
 
 
 auth_bp = Blueprint("auth_bp", __name__, url_prefix='/api/v1')
@@ -32,6 +33,11 @@ def register():
         return {'message': 'Username already taken'}, 409
     if User.query.filter_by(email=email).first():
         return {'message': 'Email already taken'}, 409
+
+    isvalid = is_valid_password(password)
+    if isvalid != True:
+        return {'message': f'{isvalid}'}, 400
+
 
     subject = "Please confirm your email"
     token = generate_confirmation_token(email)
@@ -137,6 +143,10 @@ def reset_password():
     if not user:
         return jsonify({'message': 'Not any user registered by this email'}), 404
     
+    isvalid = is_valid_password(new_password)
+    if isvalid != True:
+        return {'message': f'{isvalid}'}, 400
+    
     token = generate_confirmation_token(email)
     
     redis_conn = get_redis_connection()
@@ -205,6 +215,10 @@ def change_password():
 
         if user.verify_password(new_password):
             return jsonify({'message': 'New password cannot be the same as the old password'}), 400
+        
+        isvalid = is_valid_password(new_password)
+        if isvalid != True:
+            return {'message': f'{isvalid}'}, 400
 
         user.hash_password(new_password)
         db.session.commit()

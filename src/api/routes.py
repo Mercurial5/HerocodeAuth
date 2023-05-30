@@ -181,3 +181,32 @@ def reset_password_verify():
     db.session.commit()
     
     return jsonify({'message': 'Password changed successfully'}), 200
+
+
+@auth_bp.route('/change-password', methods=['POST'])
+def change_password():
+    if request.method == 'POST':
+        if 'username' not in session:
+            return jsonify({'message': 'Please login first'}), 401
+        
+        user = User.query.filter_by(username=session['username']).first()
+        if not user:
+            return jsonify({'message': 'User data not found'}), 404
+        
+        data = request.get_json()
+        if 'old_password' not in data or 'new_password' not in data:
+            return jsonify({'message': 'Provide old and new passwords'}), 401
+        
+        old_password = data['old_password']
+        new_password = data['new_password']
+        
+        if not user.verify_password(old_password):
+            return jsonify({'message': 'Wrong password'}), 400
+
+        if user.verify_password(new_password):
+            return jsonify({'message': 'New password cannot be the same as the old password'}), 400
+
+        user.hash_password(new_password)
+        db.session.commit()
+
+        return jsonify({'message': 'Password changed successfully'}), 200

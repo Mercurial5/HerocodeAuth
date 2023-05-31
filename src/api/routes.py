@@ -56,7 +56,7 @@ def register():
 
     send_email(current_app, token, email, subject, 'register_verify')
 
-    return jsonify({'message': 'Registration successful'}), 200
+    return jsonify({'message': 'Check your email for verification'}), 200
 
 
 @auth_bp.route('/register-verify', methods=['GET'])

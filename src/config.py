@@ -21,7 +21,7 @@ class TokenConfig:
 
 class EmailConfig:
     MAIL_SERVER = environ.get('MAIL_SERVER')
-    MAIL_PORT = int(environ.get('REDIS_PORT'))
+    MAIL_PORT = int(environ.get('MAIL_PORT'))
     MAIL_USE_TLS = False
     MAIL_USE_SSL = True
     MAIL_USERNAME = environ.get('EMAIL')

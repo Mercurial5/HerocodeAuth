@@ -164,7 +164,7 @@ def reset_password():
 
     send_email(current_app, token, email, subject, 'reset_password_verify')
 
-    return jsonify({'message': 'Password changed successfully'})
+    return jsonify({'message': 'Check your email for verification'})
 
 
 @auth_bp.route('/reset-password/verify', methods=['POST'])

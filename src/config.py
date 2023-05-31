@@ -24,6 +24,6 @@ class EmailConfig:
     MAIL_PORT = int(environ.get('MAIL_PORT'))
     MAIL_USE_TLS = False
     MAIL_USE_SSL = True
-    MAIL_USERNAME = environ.get('EMAIL')
-    MAIL_PASSWORD = environ.get('PASSWORD')
+    MAIL_USERNAME = environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = environ.get('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = environ.get('MAIL_DEFAULT_SENDER')

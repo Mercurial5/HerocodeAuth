@@ -145,6 +145,9 @@ def reset_password():
     if not user:
         return jsonify({'message': 'Not any user registered by this email'}), 404
     
+    if user.verify_password(new_password):
+        return jsonify({'message': 'New password cannot be the same as the old password'}), 400
+    
     isvalid = is_valid_password(new_password)
     if isvalid != True:
         return {'message': f'{isvalid}'}, 400
@@ -167,7 +170,7 @@ def reset_password():
     return jsonify({'message': 'Check your email for verification'})
 
 
-@auth_bp.route('/reset-password/verify', methods=['POST'])
+@auth_bp.route('/reset-password/verify')
 def reset_password_verify():
     token = request.args.get('token')
 
@@ -180,17 +183,19 @@ def reset_password_verify():
     redis_data = {key.decode(): value.decode() for key, value in redis_data_in_bytes.items()}
 
     if not redis_data:
-        return jsonify({'message': 'User data not found'}), 404
+        return jsonify({'message': 'Validation link expired'}), 404
     
+    if redis_data.get('reset') == 'True':
+        return jsonify({'message': 'Your password has already been reset'}), 200
+
     email = redis_data.get('email')
     new_password = redis_data.get('new_password')
+
     user = User.query.filter_by(email=email).first()
-
-    if user.verify_password(new_password):
-        return jsonify({'message': 'New password cannot be the same as the old password'}), 400
-
     user.hash_password(new_password)
     db.session.commit()
+
+    redis_conn.hset(redis_key, 'reset', 'True')
     
     return jsonify({'message': 'Password changed successfully'}), 200
 

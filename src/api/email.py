@@ -1,19 +1,16 @@
-from flask_mail import Message, Mail
+from flask_mail import Message
 from flask import url_for
+from api import mail
+from flask import Flask
 
-
-mail = Mail()
-
-def send_email(app, token, email, subject, endpoint):
-    mail.init_app(app)
-
-    msg = Message(
+def send_email(app: Flask, token: str, email: str, subject: str, endpoint: str):
+    
+    msg: Message = Message(
         subject,
         recipients=[email],
         sender=app.config["MAIL_DEFAULT_SENDER"],
     )
-
     
-    link = url_for(f'auth_bp.{endpoint}', token=token, _external=True)
+    link: str = url_for(f'auth_bp.{endpoint}', token=token, _external=True)
     msg.body = f'Verification link {link}'
     mail.send(msg)

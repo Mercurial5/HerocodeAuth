@@ -138,6 +138,9 @@ def logout() -> Tuple[Dict[str, Any], int]:
 def reset_password() -> Tuple[Dict[str, Any], int]:
     data: Dict[str, Any] = request.get_json()
 
+    if 'username' in session:
+            return jsonify({'message': 'You are logged in'}), 401
+    
     if 'email' not in data or 'new_password' not in data:
         return jsonify({'message': 'Please provide Email and New password'}), 401
     

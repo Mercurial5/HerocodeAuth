@@ -3,9 +3,7 @@ import bcrypt
 from api import db
 
 
-
 class User(db.Model):
-    
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -17,12 +15,12 @@ class User(db.Model):
     updated_at = db.Column(db.DateTime(), default=datetime.now)
 
 
-    def hash_password(self, plain_text_password: str):
+    def hash_password(self, plain_text_password: str) -> None:
         self.password = bcrypt.hashpw(plain_text_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
-    def verify_password(self, plain_text_password: str):
+    def verify_password(self, plain_text_password: str) -> bool:
         return bcrypt.checkpw(plain_text_password.encode('utf-8'), self.password.encode('utf-8'))
     
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'<User {self.username}>'
     

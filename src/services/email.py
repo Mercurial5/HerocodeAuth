@@ -3,7 +3,7 @@ from flask import url_for
 from api import mail
 from flask import Flask
 
-def send_email(app: Flask, token: str, email: str, subject: str, endpoint: str):
+def send_email(app: Flask, token: str, email: str, subject: str, endpoint: str) -> None:
     
     msg: Message = Message(
         subject,

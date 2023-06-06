@@ -5,7 +5,7 @@ from repositories.user_repository import create_user, find_user_by_email, find_u
 from services.validator import is_valid_email, is_valid_password
 from services.token import generate_confirmation_token
 from services.email import send_email
-from cache.cache_data import cache_user_data, get_cached_user_data, set_done
+from cache.cache_data import cache_user_data, get_cached_user_data, set_done, is_verified
 
 
 def register_controller(data) -> Tuple[Dict[str, Any], int]:
@@ -56,11 +56,11 @@ def register_verify_controller(token: str) -> Tuple[Dict[str, Any], int]:
     if not cache_data:
         return jsonify({'message': 'User data not found'}), 404
     
-    if cache_data.get('verified') == 'True':
+    if is_verified(cache_data):
         return jsonify({'message': 'User already verified!'}), 400
 
     create_user(cache_data)
 
-    set_done(token, 'verified')
+    set_done(token)
 
     return jsonify({'message': 'User verified!!!'}), 200

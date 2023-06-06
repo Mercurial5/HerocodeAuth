@@ -4,7 +4,7 @@ from models.user import User
 from services.validator import is_valid_password
 from services.token import generate_confirmation_token
 from services.email import send_email
-from cache.cache_data import cache_user_data, get_cached_user_data, set_done
+from cache.cache_data import cache_user_data, get_cached_user_data, set_done, is_verified
 from repositories.user_repository import find_user_by_email, set_password, verify_pass
 
 
@@ -46,20 +46,20 @@ def reset_password_verify_controller(token) -> Tuple[Dict[str, Any], int]:
     if not token:
         return jsonify({'message': 'Please check your email'}), 400
      
-    cashed_data: Optional[Dict[str, str]] = get_cached_user_data(token)
+    cached_data: Optional[Dict[str, str]] = get_cached_user_data(token)
     
-    if not cashed_data:
+    if not cached_data:
         return jsonify({'message': 'Validation link expired'}), 404
     
-    if cashed_data.get('reset') == 'True':
+    if is_verified(cached_data):
         return jsonify({'message': 'Your password has already been reset'}), 200
 
-    email: str = cashed_data.get('email')
-    new_password: str = cashed_data.get('new_password')
+    email: str = cached_data.get('email')
+    new_password: str = cached_data.get('new_password')
 
     user: Optional[User] = find_user_by_email(email)
     set_password(user, new_password)
 
-    set_done(token, 'reset')
+    set_done(token)
     
     return jsonify({'message': 'Password changed successfully'}), 200

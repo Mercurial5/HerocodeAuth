@@ -17,6 +17,11 @@ def get_cached_user_data(token: str) -> Optional[Dict[str, str]]:
     return redis_data
 
 
-def set_done(token: str, newfield) -> None:
+def set_done(token: str) -> None:
     redis_conn: Redis = get_redis_connection()
-    redis_conn.hset(token, newfield, 'True')
+    redis_conn.hset(token, 'verified', 'True')
+
+def is_verified(redis_data: Dict[str, str]) -> bool:
+    if redis_data.get('verified') == 'True':
+        return True
+    return False 

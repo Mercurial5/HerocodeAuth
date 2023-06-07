@@ -24,4 +24,4 @@ def set_done(token: str) -> None:
 def is_verified(redis_data: Dict[str, str]) -> bool:
     if redis_data.get('verified') == 'True':
         return True
-    return False 
+    return False

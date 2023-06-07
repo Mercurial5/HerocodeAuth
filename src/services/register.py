@@ -28,7 +28,7 @@ def register_controller(data) -> Tuple[Dict[str, Any], int]:
     if not is_valid_email(email):
         return jsonify({'message': 'Invalid email address'}), 400
     
-    isvalid: bool | str = is_valid_password(password)
+    isvalid = is_valid_password(password)
     if isvalid != True:
         return {'message': isvalid}, 400
 

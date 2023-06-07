@@ -1,11 +1,11 @@
 from typing import Tuple, Dict, Any
 from flask import Blueprint
 from flask import request
-from services.register import register_controller, register_verify_controller
-from services.login import login_controller
-from services.logout import logout_controller
-from services.change_password import change_password_controller
-from services.reset_password import reset_password_controller, reset_password_verify_controller
+from controllers.register import register_controller, register_verify_controller
+from controllers.login import login_controller
+from controllers.logout import logout_controller
+from controllers.change_password import change_password_controller
+from controllers.reset_password import reset_password_controller, reset_password_verify_controller
 
 
 auth_bp = Blueprint("auth_bp", __name__, url_prefix='/api/v1')

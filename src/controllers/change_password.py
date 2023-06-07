@@ -2,7 +2,7 @@ from typing import Optional, Dict, Any, Tuple
 from flask import jsonify, session
 from repositories.user_repository import find_user_by_username, set_password, verify_pass
 from models.user import User
-from services.validator import is_valid_password
+from controllers.validator import is_valid_password
 
 
 def change_password_controller(data: Dict[str, Any]) -> Tuple[Dict[str, Any], int]:

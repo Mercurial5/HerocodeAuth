@@ -2,9 +2,9 @@ from typing import Optional, Tuple, Dict, Any
 from flask import current_app
 from flask import jsonify
 from repositories.user_repository import create_user, find_user_by_email, find_user_by_username
-from services.validator import is_valid_email, is_valid_password
-from services.token import generate_confirmation_token
-from services.email import send_email
+from controllers.validator import is_valid_email, is_valid_password
+from controllers.token import generate_confirmation_token
+from controllers.email import send_email
 from cache.cache_data import cache_user_data, get_cached_user_data, set_done, is_verified
 
 

@@ -1,9 +1,9 @@
 from typing import Optional, Dict, Tuple, Any
 from flask import session, jsonify, current_app
 from models.user import User
-from services.validator import is_valid_password
-from services.token import generate_confirmation_token
-from services.email import send_email
+from controllers.validator import is_valid_password
+from controllers.token import generate_confirmation_token
+from controllers.email import send_email
 from cache.cache_data import cache_user_data, get_cached_user_data, set_done, is_verified
 from repositories.user_repository import find_user_by_email, set_password, verify_pass
 

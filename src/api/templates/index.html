@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth</title>
+</head>
+
+<body>
+    <h1>Auth</h1>
+
+    <h2>Register</h2>
+    <input type="text" id="register-username" placeholder="Username">
+    <input type="text" id="register-email" placeholder="Email">
+    <input type="password" id="register-password" placeholder="Password">
+    <button id="register-button">Register</button>
+
+    <h2>Login</h2>
+    <input type="text" id="login-email" placeholder="Email">
+    <input type="password" id="login-password" placeholder="Password">
+    <button id="login-button">Login</button>
+
+    <h2>Reset Password</h2>
+    <input type="text" id="reset-password-email" placeholder="Email">
+    <input type="password" id="reset-new-password" placeholder="New Password">
+    <button id="reset-password-button">Reset Password</button>
+
+    <h2>Change Password</h2>
+    <input type="password" id="change-password-email" placeholder="Old Password">
+    <input type="password" id="change-new-password" placeholder="New Password">
+    <button id="change-password-button">Change Password</button>
+
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+
+
+
+
+
+
+
+</body>
+
+</html>
